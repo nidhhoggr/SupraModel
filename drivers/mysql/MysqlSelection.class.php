@@ -29,31 +29,46 @@ class MysqlSelection implements Selection {
     }
 
     public function getQuery() {
-   
+ 
         return $this->querySql;
     }
 
-    public function find($table, $fields="*", $order = null, $fetchArray = true) {
+    public function find($args) {
 
-        return $this->findBy($table, $fields, null, $order, $fetchArray);
+        $args = array_merge(array('fields'=>'*','fetchArray'=>true),$args);
+
+        extract($args);
+
+        return $this->findBy($fields, null, $order, $fetchArray);
     }
 
-    public function findBy($table, $fields = "*", $conditions = null, $order = null, $fetchArray = true) {
+    public function findBy($args) {
+
+        $args = array_merge(array('fields'=>'*','fetchArray'=>true),$args);
+
+        extract($args);
 
         $this->_sqlizeFields($fields);
         
         $this->_sqlizeConditions($conditions);        
 
-        $this->querySql = "SELECT ". $this->sqlFields . " " . $this->_sqlConditions . " FROM $table  $order";
+        $this->querySql = "SELECT ". $this->sqlFields . " FROM " . $this->model->getTable() 
+                           . ' ' . $this->sqlConditions . " $order";
 
         if($fetchArray) return $this->_fetchArrayFromQuery();
     }
 
-    public function findOneBy($table, $fields, $conditions=null, $order = null) {
-                     
-        $this->findBy($table, $fields, $conditions, $order, false);
+    public function findOneBy($args) {
+                    
+        $args = array_merge($args,array('fetchArray'=>false));
 
-        return $this->model->queryUniqueValue($this->querySql, $this->model->getDebugMode());
+        if(!stristr($args['order'],'limit')) $args['order'] .= " LIMIT 1";
+ 
+        $this->findBy($args);
+
+        $result = $this->_fetchArrayFromQuery();
+
+        return $result[0];
     }
 
     private function _getResultFromQuery() {

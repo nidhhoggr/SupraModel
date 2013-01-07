@@ -1,11 +1,11 @@
 <?php
 interface Selection {
 
-    public function find($table,$fields,$order,$fetchArray);
+    public function find($args);
 
-    public function findBy($table,$fields,$condtions,$order,$fetchArray);
+    public function findBy($args);
 
-    public function findOneBy($table,$fields,$condtions,$order);
+    public function findOneBy($args);
 
     public function getQuery();
 }

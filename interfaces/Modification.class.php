@@ -1,7 +1,5 @@
 <?php
-interface Modiciation {
+interface Modification {
 
     public function save();
-    private function _insert();
-    private function _update();
 }

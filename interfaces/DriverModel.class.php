@@ -1,8 +1,6 @@
 <?php
 interface DriverModel {
 
-    private function _generateHandlers();
-
     public function setDebugMode($mode);
 
     public function getDebugMode();

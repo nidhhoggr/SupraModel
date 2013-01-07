@@ -8,7 +8,7 @@
 * by this model specified by the driver
 */
 
-abstract class BaseModel {
+abstract class SupraModel {
 
     private 
         $dbhost = "",
@@ -19,15 +19,17 @@ abstract class BaseModel {
     function __construct($args) {
         $this->_setConnection($args);
         $this->setDriver($args['driver']);
-        $this->instantiateDriverModel();
+        $this->_instantiateDriverModel();
         $this->configure();
     }
 
-    abstract protected function configure();
+    abstract public function configure();
 
     private function _instantiateDriverModel() {
 
         $driverModelName = ucfirst($this->driver) . 'Model';
+
+        require_once(dirname(__FILE__) . '/drivers/' . $this->driver . "/$driverModelName.class.php");
 
         $this->driverModel = new $driverModelName($this->dbname,$this->dbhost,$this->dbuser,$this->dbpassword);
     }
@@ -46,22 +48,50 @@ abstract class BaseModel {
 
     public function __call($method,$args) {
 
-        $args = implode(', ', $args);
- 
+        $callResult = null;
+
         $interfaces = array('Selection','Modification');
 
         foreach($interfaces as $interface) {
-            $methods = get_class_methods($interface);
+            
+            $methods = $this->getInterfaceMethods($interface);
 
             if(in_array($method,$methods)) {
                 $handler = strtolower($interface) . 'Handler';
-                $this->driverModel->$handler->$method($args);
+                $callResult = $this->driverModel->$handler->$method($args[0]);
                 break;
             }
         }
+
+        return $callResult;
     }
 
-    public function setDriver() {
+    private function getInterfaceMethods($interfaceName) {
+
+        $methods = array(
+            'Modification'=>array(
+                'save'
+            ),
+            'Selection'=>array(
+                'find',
+                'findBy',
+                'findOneBy',
+                'getQuery'
+            ),
+            'DriverModel'=>array(
+                'setDebugMode',
+                'getDebugMode',
+                'setTable',
+                'getTable',
+                'setTableIndentifier',
+                'getTableIndentifier'
+            )
+        );
+
+        return $methods[$interfaceName];
+    }
+
+    public function setDriver($driver) {
         
         $this->driver = $driver;
     }

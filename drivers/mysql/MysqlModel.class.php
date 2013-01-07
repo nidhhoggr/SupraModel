@@ -1,6 +1,7 @@
 <?php
 
 require_once(dirname(__FILE__) . "/../../interfaces/DriverModel.class.php");
+require_once(dirname(__FILE__) . "/MysqlDB.class.php");
 
 class MysqlModel extends MysqlDB implements DriverModel {
 
@@ -22,9 +23,9 @@ class MysqlModel extends MysqlDB implements DriverModel {
 
             $handlerVar = strtolower($interface) . 'Handler';
             $handlerClass = 'Mysql' . $interface;
-            require_once(dirname(__FILE__) . "/$handlerClass.class.php");
             require_once(dirname(__FILE__) . "/../../interfaces/$interface.class.php");
-            $this->$handler = new $handlerClass($this);
+            require_once(dirname(__FILE__) . "/$handlerClass.class.php");
+            $this->$handlerVar = new $handlerClass($this);
         }
     }
 
