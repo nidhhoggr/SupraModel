@@ -32,6 +32,7 @@ abstract class SupraModel {
         require_once(dirname(__FILE__) . '/drivers/' . $this->driver . "/$driverModelName.class.php");
 
         $this->driverModel = new $driverModelName($this->dbname,$this->dbhost,$this->dbuser,$this->dbpassword);
+
     }
 
     private function _setConnection($args) {
@@ -46,24 +47,52 @@ abstract class SupraModel {
 	}
     }
 
-    public function __call($method,$args) {
+    public function __call($method,$args = array()) {
 
         $callResult = null;
 
+        $methodFound = false;
+
         $interfaces = array('Selection','Modification');
+
+        $args = (count($args)) ?  $args[0] : null;
 
         foreach($interfaces as $interface) {
             
             $methods = $this->getInterfaceMethods($interface);
 
             if(in_array($method,$methods)) {
+                $methodFound = true;
                 $handler = strtolower($interface) . 'Handler';
-                $callResult = $this->driverModel->$handler->$method($args[0]);
+                $callResult = $this->driverModel->$handler->$method($args);
                 break;
             }
         }
 
+        if(!$methodFound)
+            $callResult = $this->driverModel->$method($args);
+
         return $callResult;
+    }
+
+
+    public function __set($name,$value) {
+
+        $driver_vars = array(
+            'dbname',
+            'dbhost',
+            'dbuser',
+            'dbpassword',
+            'driver',
+            'driverModel'
+        );
+
+        if(!in_array($name,$driver_vars)) {
+            $this->driverModel->$name = $value;
+        }
+        else {
+            $this->$name = $value;
+        }
     }
 
     private function getInterfaceMethods($interfaceName) {

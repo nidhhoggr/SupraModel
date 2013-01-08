@@ -17,7 +17,7 @@ class BirdModel extends SupraModel {
     //SET THE TABLE OF THE MODEL AND THE IDENTIFIER
     public function configure() {
 
-        $this->driverModel->setTable("bird");
+        $this->setTable("bird");
     }
 }
 

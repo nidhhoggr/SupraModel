@@ -35,34 +35,41 @@ class MysqlSelection implements Selection {
 
     public function find($args) {
 
-        $args = array_merge(array('fields'=>'*','fetchArray'=>true),$args);
+        $args = array_merge(array('fields'=>'*','fetchArray'=>true),(array)$args);
 
         extract($args);
 
-        return $this->findBy($fields, null, $order, $fetchArray);
+        return $this->findBy(compact('fields','order','fetchArray'));
     }
 
     public function findBy($args) {
 
-        $args = array_merge(array('fields'=>'*','fetchArray'=>true),$args);
+        $args = array_merge(array('fields'=>'*','fetchArray'=>true),(array)$args);
 
         extract($args);
 
-        $this->_sqlizeFields($fields);
+        if(isset($fields))
+            $this->_sqlizeFields($fields);
         
-        $this->_sqlizeConditions($conditions);        
+        if(isset($conditions))
+            $this->_sqlizeConditions($conditions);        
 
         $this->querySql = "SELECT ". $this->sqlFields . " FROM " . $this->model->getTable() 
-                           . ' ' . $this->sqlConditions . " $order";
+                           . ' ' . $this->sqlConditions;
+
+        if(isset($order))
+            $this->querySql .= " $order";
 
         if($fetchArray) return $this->_fetchArrayFromQuery();
     }
 
     public function findOneBy($args) {
                     
-        $args = array_merge($args,array('fetchArray'=>false));
+        $args = array_merge((array)$args,array('fetchArray'=>false));
 
-        if(!stristr($args['order'],'limit')) $args['order'] .= " LIMIT 1";
+     
+        if(isset($args['order']))
+            if(!stristr($args['order'],'limit')) $args['order'] .= " LIMIT 1";
  
         $this->findBy($args);
 

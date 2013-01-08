@@ -17,7 +17,7 @@ class MysqlModification implements Modification {
             $conditions = $identifier . ' = "' . $attributes[$identifier] . '"';
 
         //the record already exists by the specified identifier
-        if($this->model->findOne($conditions) && !empty($conditions)) {
+        if($this->model->selectionHandler->findOneBy(array($conditions)) && !empty($conditions)) {
             $this->_update();
 
             //return the modified id
@@ -40,8 +40,8 @@ class MysqlModification implements Modification {
         $columns = $this->model->getColumnsByTable($this->model->getTable());
 
         foreach($columns as $col) {
-            if(!empty($this->$col))
-                $attributes[$col] = $this->$col;
+            if(!empty($this->model->$col))
+                $attributes[$col] = $this->model->$col;
         }
 
         return $attributes;
