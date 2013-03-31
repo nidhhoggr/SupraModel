@@ -124,4 +124,8 @@ abstract class SupraModel {
         
         $this->driver = $driver;
     }
+ 
+    public function getDatabase() {
+        return $this->dbname;
+    }
 }

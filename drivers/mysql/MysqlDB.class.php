@@ -19,7 +19,7 @@
     var $lastResult;
 
     var $findResult;
-
+   
     /** Connect to a MySQL database to be able to use the methods below.
       */
     function MysqlDB($base, $server, $user, $pass)

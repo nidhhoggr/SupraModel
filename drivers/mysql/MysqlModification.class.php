@@ -39,6 +39,7 @@ class MysqlModification implements Modification {
 
         $columns = $this->model->getColumnsByTable($this->model->getTable());
 
+
         foreach($columns as $col) {
             if(!empty($this->model->$col))
                 $attributes[$col] = $this->model->$col;
@@ -85,7 +86,7 @@ class MysqlModification implements Modification {
         $attributes = $this->_updateAttributes();
 
         $sql = 'UPDATE ' . $this->model->getTable() . ' ' . $attributes;
-
+ 
         $this->model->execute($sql);
     }
 
