@@ -10,10 +10,14 @@ class MysqlModel extends MysqlDB implements DriverModel {
         $table_identifier = "id";
 
     public function __construct($base, $server, $user, $pass) {
-
+        $this->dbArgs = compact('base','server','user','pass');
         parent::__construct($base, $server, $user, $pass);
         $this->_generateHandlers();
     }
+
+    public function reinitialize($supraModelChild) {
+      $this->setDatabase($this->dbArgs['base']);
+    } 
 
     private function _generateHandlers() {
 
@@ -27,6 +31,10 @@ class MysqlModel extends MysqlDB implements DriverModel {
             require_once(dirname(__FILE__) . "/$handlerClass.class.php");
             $this->$handlerVar = new $handlerClass($this);
         }
+    }
+
+    public function getDatabase() {
+      return $this->dbArgs['base'];
     }
 
     public function setDebugMode($mode) {

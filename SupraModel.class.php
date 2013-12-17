@@ -10,7 +10,7 @@
 
 abstract class SupraModel {
 
-    private 
+    private
         $dbhost = "",
         $dbuser = "",
         $dbpassword = "",
@@ -48,6 +48,8 @@ abstract class SupraModel {
     }
 
     public function __call($method,$args = array()) {
+
+        $this->driverModel->reinitialize($this);
 
         $callResult = null;
 
@@ -126,6 +128,6 @@ abstract class SupraModel {
     }
  
     public function getDatabase() {
-        return $this->dbname;
+      $this->driverModel->getDatabase(); 
     }
 }

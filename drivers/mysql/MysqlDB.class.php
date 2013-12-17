@@ -28,6 +28,10 @@
       $this->nbQueries  = 0;
       $this->lastResult = NULL;
       mysql_connect($server, $user, $pass) or die('Server connexion not possible.');
+      $this->setDatabase($base);
+    }
+
+    function setDatabase($base) {
       mysql_select_db($base)               or die('Database connexion not possible.');
     }
 
