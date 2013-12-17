@@ -39,14 +39,23 @@ class MysqlModification implements Modification {
 
         $columns = $this->model->getColumnsByTable($this->model->getTable());
 
-
         foreach($columns as $col) {
-            if(!empty($this->model->$col))
-                $attributes[$col] = $this->model->$col;
+
+            if(isset($this->model->$col))
+              $val = $this->model->$col;
+            else 
+              continue;
+ 
+            if(is_array($val))
+                $attributes[$col] = $this->model->serializeArray($val);
+            else if(!empty($val))
+                $attributes[$col] = $val;
         }
 
         return $attributes;
     }
+
+    
 
     private function _insertAttributes() {
 

@@ -58,4 +58,22 @@ class MysqlModel extends MysqlDB implements DriverModel {
 
         return $this->table_identifier;
     }
+
+    public function serializeArray($val) {
+      if(is_array($val))
+        return addslashes(serialize($val));
+      else
+        return $val;
+    }
+
+    public function unserializeArray($val) {
+      if($this->isSerialized($val))
+        return unserialize(stripslashes($val));
+      else 
+        return $val;
+    }
+
+    public function isSerialized($val) {
+      return (substr($val,0,2) == "a:") && (substr($val,-1) == "}");
+    }
 }

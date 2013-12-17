@@ -95,17 +95,33 @@ class MysqlSelection implements Selection {
             $values = null;
 
             if($fields == "*") {
-                $all[] = $row;
+              foreach($row as $k=>$col) {
+
+                $col = $this->model->unserializeArray($col);
+
+                $values[$k] = $col;
+              }
+
+              $all[] = $values;
             }
             else if(is_array($fields)) {
                 foreach($fields as $field) {
-                    $values[$field] = $row[$field];
+                  $val = $row[$field];
+
+                  $val = $this->model->unserializeArray($val);
+
+                  $values[$field] = $val;
                 }
 
                 $all[] = $values;
             }
             else {
-                $all[] = $row[$fields];
+
+                $val = $row[$fields];
+
+                $val = $this->model->unserializeArray($val);
+
+                $all[] = $val;
             }
         }
 

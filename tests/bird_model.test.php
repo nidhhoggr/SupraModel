@@ -23,11 +23,22 @@ class BirdModel extends SupraModel {
 
 $BirdModel = new BirdModel($connection_args);
 
+//find all by specific conditions and return array
 var_dump($BirdModel->findBy(array('conditions'=>array("id=195"),'fetchArray'=>false)));
 
-var_dump($BirdModel->getQuery());
-
+//change the table
 $BirdModel->setTable('bird_taxonomy');
 
+//find one bird
 var_dump($BirdModel->findOneBy(array('conditions'=>"name LIKE '%arizona%'")));
+//get the sql query
 var_dump($BirdModel->getQuery());
+
+//change the table again 
+$BirdModel->setTable('bird');
+
+//save a new bird
+$BirdModel->name = 'toojay';
+$BirdModel->colors = array('black','white');
+//returns the id
+$bird_id = $BirdModel->save();
