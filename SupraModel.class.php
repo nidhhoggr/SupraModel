@@ -31,7 +31,7 @@ abstract class SupraModel {
 
         require_once(dirname(__FILE__) . '/drivers/' . $this->driver . "/$driverModelName.class.php");
 
-        $this->driverModel = new $driverModelName($this->dbname,$this->dbhost,$this->dbuser,$this->dbpassword);
+        $this->driverModel = new $driverModelName($this->dbname,$this->dbhost,$this->dbuser,$this->dbpassword,$this);
 
     }
 
@@ -57,8 +57,6 @@ abstract class SupraModel {
 
         $interfaces = array('Selection','Modification');
 
-        $args = (count($args)) ?  $args[0] : null;
-
         foreach($interfaces as $interface) {
             
             $methods = $this->getInterfaceMethods($interface);
@@ -66,15 +64,29 @@ abstract class SupraModel {
             if(in_array($method,$methods)) {
                 $methodFound = true;
                 $handler = strtolower($interface) . 'Handler';
-                $callResult = $this->driverModel->$handler->$method($args);
+                $callResult = $this->_makeCall($this->driverModel->$handler, $method, $args);
                 break;
             }
         }
 
         if(!$methodFound)
-            $callResult = $this->driverModel->$method($args);
+            $callResult = $this->_makeCall($this->driverModel, $method, $args);
 
         return $callResult;
+    }
+
+    private function _makeCall($obj, $method, $args) { 
+
+      if(count($args) == 0)
+        $callResult = $obj->$method();
+      else if(count($args) == 1)
+        $callResult = $obj->$method($args[0]);
+      else if(count($args) == 2)
+        $callResult = $obj->$method($args[0], $args[1]);
+      else 
+        Throw new Exception("callable proxy methods can obtain no more than 2 args");
+
+      return $callResult;
     }
 
 

@@ -60,7 +60,7 @@ class MysqlSelection implements Selection {
         if(isset($order))
             $this->querySql .= " $order";
 
-        if($fetchArray) return $this->_fetchArrayFromQuery();
+        if($fetchArray) return $this->_fetchObjectFromQuery();
     }
 
     public function findOneBy($args) {
@@ -73,7 +73,7 @@ class MysqlSelection implements Selection {
  
         $this->findBy($args);
 
-        $result = $this->_fetchArrayFromQuery();
+        $result = $this->_fetchObjectFromQuery();
 
         return $result[0];
     }
@@ -83,7 +83,7 @@ class MysqlSelection implements Selection {
         return $this->model->query($this->querySql, $this->model->getDebugMode());
     }
 
-    private function _fetchArrayFromQuery() {
+    private function _fetchObjectFromQuery() {
 
        $result = $this->_getResultFromQuery();
 
@@ -91,40 +91,71 @@ class MysqlSelection implements Selection {
 
        $fields = $this->sqlFields;
 
-        while($row = mysql_fetch_assoc($result)) {
-            $values = null;
 
+        while($row = mysql_fetch_object($result)) {
+
+            $sm = new stdClass();
+ 
             if($fields == "*") {
               foreach($row as $k=>$col) {
 
-                $col = $this->model->unserializeArray($col);
+                try {
+                  $col = $this->model->unserializeArray($col);
+                } catch(Exception $e) {
+                  $col = false;
+                  $this->_catchException($e, $row);
+                }
 
-                $values[$k] = $col;
+                $sm->$k = $col;
               }
 
-              $all[] = $values;
+              $all[] = $sm;
             }
             else if(is_array($fields)) {
                 foreach($fields as $field) {
-                  $val = $row[$field];
 
-                  $val = $this->model->unserializeArray($val);
+                  $val = $row->$field;
 
-                  $values[$field] = $val;
+                  try {
+                    $val = $this->model->unserializeArray($val);
+                  } catch(Exception $e) {
+                    $val = false;
+                    $this->_catchException($e, $row);
+                  }
+
+                  $sm->$field = $val;
                 }
 
-                $all[] = $values;
+                $all[] = $sm;
             }
             else {
 
-                $val = $row[$fields];
+                $val = $row->$fields;
+ 
+                try { 
+                  $val = $this->model->unserializeArray($val);
+                } catch(Exception $e) { 
+                  $val = false;
+                  $this->_catchException($e, $row);
+                }
 
-                $val = $this->model->unserializeArray($val);
+                $sm->$fields = $val;
 
-                $all[] = $val;
+                $all[] = $sm;
             }
         }
 
         return $all;
+    }
+
+    private function _catchException($e, $values) {
+              
+      $err = "Problem unpacking object of id: " . $values->{$this->model->getTableIdentifier()};
+
+      $this->errors[] = $err . " " .$e->getMessage();
+    }
+
+    public function getErrors() {
+        return $this->errors;
     }
 }

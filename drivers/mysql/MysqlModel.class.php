@@ -75,10 +75,21 @@ class MysqlModel extends MysqlDB implements DriverModel {
     }
 
     public function unserializeArray($val) {
-      if($this->isSerialized($val))
-        return unserialize(stripslashes($val));
-      else 
-        return $val;
+      if($this->isSerialized($val)) { 
+        $nval = unserialize(stripslashes($val));
+        if(!$nval) {
+          Throw new Exception("Problem serializing: " . $val);
+        }
+        $val = $nval;
+      }
+      return $val;
+    }
+
+    public function bindObject(SupraModel &$cobj, stdClass $obj) {
+
+      foreach((array) $obj as $k=>$v) {
+        $cobj->$k = $v;
+      }
     }
 
     public function isSerialized($val) {
