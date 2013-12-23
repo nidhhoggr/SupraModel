@@ -33,7 +33,7 @@ class MysqlSelection implements Selection {
         return $this->querySql;
     }
 
-    public function find($args) {
+    public function find($args = array()) {
 
         $args = array_merge(array('fields'=>'*','fetchArray'=>true),(array)$args);
 
@@ -75,7 +75,10 @@ class MysqlSelection implements Selection {
 
         $result = $this->_fetchObjectFromQuery();
 
-        return $result[0];
+        if(count($result))
+          return $result[0];
+        else
+          return false;
     }
 
     private function _getResultFromQuery() {

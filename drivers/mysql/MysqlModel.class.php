@@ -16,6 +16,7 @@ class MysqlModel extends MysqlDB implements DriverModel {
     }
 
     public function reinitialize($supraModelChild) {
+
       $this->setDatabase($this->dbArgs['base']);
     } 
 
@@ -69,14 +70,14 @@ class MysqlModel extends MysqlDB implements DriverModel {
 
     public function serializeArray($val) {
       if(is_array($val))
-        return addslashes(serialize($val));
+        return base64_encode(serialize($val));
       else
         return $val;
     }
 
     public function unserializeArray($val) {
       if($this->isSerialized($val)) { 
-        $nval = unserialize(stripslashes($val));
+        $nval = @unserialize(base64_decode($val));
         if(!$nval) {
           Throw new Exception("Problem serializing: " . $val);
         }
@@ -93,6 +94,7 @@ class MysqlModel extends MysqlDB implements DriverModel {
     }
 
     public function isSerialized($val) {
+      $val = base64_decode($val);
       return (substr($val,0,2) == "a:") && (substr($val,-1) == "}");
     }
 }
