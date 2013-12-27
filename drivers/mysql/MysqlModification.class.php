@@ -33,6 +33,21 @@ class MysqlModification implements Modification {
 
     }
 
+    public function delete() {
+
+        $identifier = $this->model->getTableIdentifier();
+
+        $attributes = $this->_getAttributes();
+
+        $where = ' WHERE ' . $identifier .' = '. $attributes[$identifier];
+
+        $sql = 'DELETE FROM ' . $this->model->getTable() . ' ' . $where;
+
+        $this->model->execute($sql);
+
+        return $this->model->numRowsAffected();
+    }
+
     private function _getAttributes() {
 
         $attributes = array();

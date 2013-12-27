@@ -113,7 +113,8 @@ abstract class SupraModel {
 
         $methods = array(
             'Modification'=>array(
-                'save'
+                'save',
+                'delete'
             ),
             'Selection'=>array(
                 'find',
@@ -127,7 +128,8 @@ abstract class SupraModel {
                 'setTable',
                 'getTable',
                 'setTableIndentifier',
-                'getTableIndentifier'
+                'getTableIndentifier',
+                'bindObject'
             )
         );
 

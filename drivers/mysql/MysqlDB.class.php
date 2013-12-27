@@ -274,6 +274,12 @@
     {
       return mysql_insert_id();
     }
+
+    function numRowsAffected()
+    {
+      return mysql_affected_rows(); 
+    }
+
     /** Close the connexion with the database server.\n
       * It's usually unneeded since PHP do it automatically at script end.
       */
