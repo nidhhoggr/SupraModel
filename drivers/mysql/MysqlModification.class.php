@@ -33,6 +33,40 @@ class MysqlModification implements Modification {
 
     }
 
+    //just like save with one less query
+    //beware this does not check if the value doesnt exist
+    public function update() {
+
+        $identifier = $this->model->getTableIdentifier();
+        $attributes = $this->_getAttributes();
+        $conditions = null;
+
+        if(!empty($attributes[$identifier]))
+            $conditions = $identifier . ' = "' . $attributes[$identifier] . '"';
+
+        $this->_update();
+
+            //return the modified id
+        return $attributes[$identifier];
+    }
+
+    //just like save with one less query
+    //beware this does not check if the value doesnt exist
+    public function insert() {
+
+        $identifier = $this->model->getTableIdentifier();
+        $attributes = $this->_getAttributes();
+        $conditions = null;
+
+        if(!empty($attributes[$identifier]))
+            $conditions = $identifier . ' = "' . $attributes[$identifier] . '"';
+
+        $this->_insert();
+
+        //return the last insertion id
+        return $this->model->lastInsertedId();
+    }
+
     public function delete() {
 
         $identifier = $this->model->getTableIdentifier();

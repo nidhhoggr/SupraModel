@@ -19,7 +19,9 @@
     var $lastResult;
 
     var $findResult;
-   
+  
+    var $tableColumns;
+ 
     /** Connect to a MySQL database to be able to use the methods below.
       */
     function MysqlDB($base, $server, $user, $pass)
@@ -42,6 +44,7 @@
       */
     function query($query, $debug = -1)
     {
+
       $this->nbQueries++;
       $this->lastResult = mysql_query($query) or $this->debugAndDie($query);
 
@@ -57,6 +60,7 @@
     function execute($query, $debug = -1)
     {
       $this->nbQueries++;
+
       mysql_query($query) or $this->debugAndDie($query);
 
       $this->debug($debug, $query);
@@ -314,12 +318,22 @@
         mysql_query("TRUNCATE TABLE $table");
     }
 
-    function getColumnsByTable($table) {
-        $result = $this->query('SHOW COLUMNS IN ' . $table);
+    function getColumnsByTable($table, $fromCache = true) {
 
-        while($row = mysql_fetch_assoc($result))
-            $columns[] = $row['Field'];
+        if($fromCache && !is_null($this->tableColumns[$table])) { 
 
-        return $columns;
+            return $this->tableColumns[$table];
+        }
+        else { 
+
+            $this->tableColumns[$table] = array();
+
+            $result = $this->query('SHOW COLUMNS IN ' . $table);
+
+            while($row = mysql_fetch_assoc($result))
+                $this->tableColumns[$table][] = $row['Field'];
+
+            return $this->tableColumns[$table];
+        }
     }
 } 

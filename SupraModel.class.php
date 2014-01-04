@@ -114,7 +114,9 @@ abstract class SupraModel {
         $methods = array(
             'Modification'=>array(
                 'save',
-                'delete'
+                'delete',
+                'update',
+                'insert'
             ),
             'Selection'=>array(
                 'find',
