@@ -46,7 +46,7 @@
     {
 
       $this->nbQueries++;
-      $this->lastResult = mysql_query($query) or $this->debugAndDie($query);
+      $this->lastResult = mysql_query($query) or $this->debugAndThrowError($query);
 
       $this->debug($debug, $query, $this->lastResult);
 
@@ -61,7 +61,7 @@
     {
       $this->nbQueries++;
 
-      mysql_query($query) or $this->debugAndDie($query);
+      mysql_query($query) or $this->debugAndThrowError($query);
 
       $this->debug($debug, $query);
     }
@@ -102,7 +102,7 @@
       $query = "$query LIMIT 1";
 
       $this->nbQueries++;
-      $result = mysql_query($query) or $this->debugAndDie($query);
+      $result = mysql_query($query) or $this->debugAndThrowError($query);
 
       $this->debug($debug, $query, $result);
 
@@ -120,7 +120,7 @@
       $query = "$query LIMIT 1";
 
       $this->nbQueries++;
-      $result = mysql_query($query) or $this->debugAndDie($query);
+      $result = mysql_query($query) or $this->debugAndThrowError($query);
       $line = mysql_fetch_row($result);
 
       $this->debug($debug, $query, $result);
@@ -172,6 +172,13 @@
       $this->debugQuery($query, "Error");
       die("<p style=\"margin: 2px;\">".mysql_error()."</p></div>");
     }
+
+    function debugAndThrowError($query)
+    {
+      $this->debugQuery($query, "Error");
+      Throw new Exception("<p style=\"margin: 2px;\">".mysql_error()."</p></div>");
+    }
+
     /** Internal function to debug a MySQL query.\n
       * Show the query and output the resulting table if not NULL.
       * @param $debug The parameter passed to query() functions. Can be boolean or -1 (default).

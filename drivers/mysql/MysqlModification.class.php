@@ -7,7 +7,13 @@ class MysqlModification implements Modification {
         $this->model = $model; 
     }
 
-    public function save() {
+    public function save($args = array()) {
+
+        //for join tables
+        if(array_key_exists('hasIdentifier',$args) && !$args['hasIdentifier']) {
+            $this->_insert();
+            return true; //assume it works
+        }
 
         $identifier = $this->model->getTableIdentifier();
         $attributes = $this->_getAttributes();
@@ -17,7 +23,7 @@ class MysqlModification implements Modification {
             $conditions = $identifier . ' = "' . $attributes[$identifier] . '"';
 
         //the record already exists by the specified identifier
-        if($this->model->selectionHandler->findOneBy(array($conditions)) && !empty($conditions)) {
+        if(!empty($conditions) && $this->model->selectionHandler->findOneBy(array($conditions))) {
             $this->_update();
 
             //return the modified id
@@ -26,7 +32,6 @@ class MysqlModification implements Modification {
         //the record doesnt exist yet create a new one
         else {
             $this->_insert();
-
             //return the last insertion id
             return $this->model->lastInsertedId();
         }
