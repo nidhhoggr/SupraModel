@@ -169,14 +169,14 @@
       */
     function debugAndDie($query)
     {
-      $this->debugQuery($query, "Error");
-      die("<p style=\"margin: 2px;\">".mysql_error()."</p></div>");
+      echo($query . ' ' . mysql_error());
+      die($query . ' ' . mysql_error());
     }
 
     function debugAndThrowError($query)
     {
-      $this->debugQuery($query, "Error");
-      Throw new Exception("<p style=\"margin: 2px;\">".mysql_error()."</p></div>");
+      echo($query . ' ' . mysql_error());
+      Throw new Exception($query . ' ' . mysql_error());
     }
 
     /** Internal function to debug a MySQL query.\n
@@ -207,6 +207,7 @@
     function debugQuery($query, $reason = "Debug")
     {
       $color = ($reason == "Error" ? "red" : "orange");
+      
       echo "<div style=\"border: solid $color 1px; margin: 2px;\">".
            "<p style=\"margin: 0 0 2px 0; padding: 0; background-color: #DDF;\">".
            "<strong style=\"padding: 0 3px; background-color: $color; color: white;\">$reason:</strong> ".
