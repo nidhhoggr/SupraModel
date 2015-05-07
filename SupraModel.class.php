@@ -1,4 +1,5 @@
 <?php
+
 /**
 * @author: joseph persie
 *
@@ -16,7 +17,24 @@ abstract class SupraModel {
         $dbpassword = "",
         $dbname = "";
 
-    function __construct($args) {
+    function __construct($args = array()) {
+
+        if(!count($args))
+        {
+            $yaml_settings_file = dirname(__FILE__) . '/config/config.yml';
+            
+            $json_settings_file = dirname(__FILE__) . '/config/config.json';
+
+            if(function_exists('yaml_parse_file') && file_exists($yaml_settings_file))
+            {
+                $args = yaml_parse_file($yaml_settings_file);
+            }
+            else if(file_exists($json_settings_file))
+            {
+                $args = json_decode(file_get_contents($json_settings_file),  true);
+            }        
+        }
+
         $this->_setConnection($args);
         $this->setDriver($args['driver']);
         $this->_instantiateDriverModel();
@@ -37,14 +55,14 @@ abstract class SupraModel {
 
     private function _setConnection($args) {
 
-	$array_vars = array('dbname','dbhost','dbuser','dbpassword');
+        $array_vars = array('dbname','dbhost','dbuser','dbpassword');
 
-	foreach($array_vars as $av) {
-	    if(empty($args[$av]))
-	        die("Must provide all 4 paramaters for a db connection");
+        foreach($array_vars as $av) {
+            if(!isset($args[$av]))
+                die("Must provide all 4 paramaters for a db connection");
 
             $this->$av = $args[$av];
-	}
+        }
     }
 
     public function __call($method,$args = array()) {

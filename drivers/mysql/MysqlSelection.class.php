@@ -54,8 +54,33 @@ class MysqlSelection implements Selection {
         if(isset($conditions))
             $this->_sqlizeConditions($conditions);        
 
-        $this->querySql = "SELECT ". $this->sqlFields . " FROM " . $this->model->getTable() 
-                           . ' ' . $this->sqlConditions;
+        $this->querySql = "SELECT ". $this->sqlFields . " FROM " . $this->model->getTable();
+
+        $joinClauses = array(
+            'join',
+            'leftjoin',
+            'rightjoin',
+            'innerjoin',
+            'left_outerjoin',
+            'right_outerjoin'
+        );
+
+        foreach($joinClauses as $joinClause)
+        {
+            $joinType = str_replace('join', '', $joinClause);
+            
+            $joinType = str_replace('_', ' ', $joinType);
+
+            if(isset($$joinClause)) 
+            {
+                foreach($$joinClause as $table=>$criteria)
+                {
+                    $this->querySql .= " {$joinType} JOIN {$table} ON {$criteria} ";
+                }
+            }
+        }
+        
+        $this->querySql .= ' ' . $this->sqlConditions;
 
         if(isset($order))
             $this->querySql .= " $order";
