@@ -1,5 +1,7 @@
 <?php
-interface DriverModel {
+namespace SupraModel\Interfaces;
+
+interface DriverModelInterface {
 
     public function setDebugMode($mode);
 

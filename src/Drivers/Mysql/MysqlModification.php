@@ -1,6 +1,9 @@
 <?php
+namespace SupraModel\Drivers\Mysql;
 
-class MysqlModification implements Modification {
+use SupraModel\Interfaces\ModificationInterface;
+
+class MysqlModification implements ModificationInterface {
 
     public function __construct(MysqlModel $model) {
 

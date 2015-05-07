@@ -1,14 +1,22 @@
 <?php
 
-/**
-* @author: joseph persie
-*
-* this is the base model class to configure and extend
-* the configuration method must be implemented to set the 
-* identifier and the table name. Basic crud operations can be performed
-* by this model specified by the driver
-*/
+namespace SupraModel;
 
+/**
+ * SupraModel 
+ * 
+ * this is the base model class to configure and extend
+ * the configuration method must be implemented to set the 
+ * identifier and the table name. Basic crud operations can be performed
+ * by this model specified by the driver
+ *
+ * @abstract
+ * @package 
+ * @version $id$
+ * @copyright 
+ * @author Joseph Persie <joseph@supraliminalsolutions.com> 
+ * @license 
+ */
 abstract class SupraModel {
 
     private
@@ -21,9 +29,9 @@ abstract class SupraModel {
 
         if(!count($args))
         {
-            $yaml_settings_file = dirname(__FILE__) . '/config/config.yml';
+            $yaml_settings_file = dirname(__FILE__) . '/../config/config.yml';
             
-            $json_settings_file = dirname(__FILE__) . '/config/config.json';
+            $json_settings_file = dirname(__FILE__) . '/../config/config.json';
 
             if(function_exists('yaml_parse_file') && file_exists($yaml_settings_file))
             {
@@ -36,8 +44,11 @@ abstract class SupraModel {
         }
 
         $this->_setConnection($args);
+        
         $this->setDriver($args['driver']);
+        
         $this->_instantiateDriverModel();
+        
         $this->configure();
     }
 
@@ -45,12 +56,13 @@ abstract class SupraModel {
 
     private function _instantiateDriverModel() {
 
-        $driverModelName = ucfirst($this->driver) . 'Model';
+        $driverName = ucfirst($this->driver);
 
-        require_once(dirname(__FILE__) . '/drivers/' . $this->driver . "/$driverModelName.class.php");
+        $driverModelName = $driverName . 'Model';
 
-        $this->driverModel = new $driverModelName($this->dbname,$this->dbhost,$this->dbuser,$this->dbpassword,$this);
+        $driverClassName = "SupraModel\\Drivers\\$driverName\\$driverModelName";
 
+        $this->driverModel = new $driverClassName($this->dbname, $this->dbhost, $this->dbuser, $this->dbpassword);
     }
 
     private function _setConnection($args) {

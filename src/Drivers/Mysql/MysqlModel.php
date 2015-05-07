@@ -1,17 +1,22 @@
 <?php
+namespace SupraModel\Drivers\Mysql;
 
-require_once(dirname(__FILE__) . "/../../interfaces/DriverModel.class.php");
-require_once(dirname(__FILE__) . "/MysqlDB.class.php");
+use SupraModel\Interfaces\DriverModelInterface;
 
-class MysqlModel extends MysqlDB implements DriverModel {
+use SupraModel\Drivers\Mysql\MysqlDB;
 
+class MysqlModel extends MysqlDB implements DriverModelInterface 
+{
     private 
         $debugMode = false,
         $table_identifier = "id";
 
     public function __construct($base, $server, $user, $pass) {
+        
         $this->dbArgs = compact('base','server','user','pass');
+
         parent::__construct($base, $server, $user, $pass);
+        
         $this->_generateHandlers();
     }
 
@@ -27,9 +32,9 @@ class MysqlModel extends MysqlDB implements DriverModel {
         foreach($interfaces as $interface) {
 
             $handlerVar = strtolower($interface) . 'Handler';
-            $handlerClass = 'Mysql' . $interface;
-            require_once(dirname(__FILE__) . "/../../interfaces/$interface.class.php");
-            require_once(dirname(__FILE__) . "/$handlerClass.class.php");
+
+            $handlerClass = "SupraModel\\Drivers\\Mysql\\Mysql$interface";
+
             $this->$handlerVar = new $handlerClass($this);
         }
     }

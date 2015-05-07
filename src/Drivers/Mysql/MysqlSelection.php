@@ -1,6 +1,9 @@
 <?php 
+namespace SupraModel\Drivers\Mysql;
 
-class MysqlSelection implements Selection {
+use SupraModel\Interfaces\SelectionInterface;
+
+class MysqlSelection implements SelectionInterface {
 
     private 
         $querySql,
@@ -122,7 +125,7 @@ class MysqlSelection implements Selection {
 
         while($row = mysql_fetch_object($result)) {
 
-            $sm = new stdClass();
+            $sm = new \stdClass();
  
             if($fields == "*") {
               foreach($row as $k=>$col) {

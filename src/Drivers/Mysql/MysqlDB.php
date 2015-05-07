@@ -1,5 +1,8 @@
 <?php
-  /** A PHP class to access MySQL database with convenient methods
+
+namespace SupraModel\Drivers\Mysql;
+
+/** A PHP class to access MySQL database with convenient methods
     * @version  1.0
     */
   class MysqlDB
@@ -24,7 +27,7 @@
  
     /** Connect to a MySQL database to be able to use the methods below.
       */
-    function MysqlDB($base, $server, $user, $pass)
+    function __construct($base, $server, $user, $pass)
     {
       $this->mtStart    = $this->getMicroTime();
       $this->nbQueries  = 0;

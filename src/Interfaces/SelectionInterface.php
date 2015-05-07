@@ -1,6 +1,8 @@
 <?php
-interface Selection {
+namespace SupraModel\Interfaces;
 
+interface SelectionInterface
+{
     public function find($args);
 
     public function findBy($args);
