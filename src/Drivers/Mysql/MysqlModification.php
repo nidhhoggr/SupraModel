@@ -23,10 +23,11 @@ class MysqlModification implements ModificationInterface {
         $conditions = null;
 
         if(!empty($attributes[$identifier]))
-            $conditions = $identifier . ' = "' . $attributes[$identifier] . '"';
+            $conditions = array($identifier . ' = "' . $attributes[$identifier] . '"');
 
         //the record already exists by the specified identifier
-        if(!empty($conditions) && $this->model->selectionHandler->findOneBy(array($conditions))) {
+        if(!empty($conditions) && $this->model->selectionHandler->findOneBy(compact('conditions'))) {
+        
             $this->_update();
 
             //return the modified id
@@ -105,8 +106,11 @@ class MysqlModification implements ModificationInterface {
  
             if(is_array($val))
                 $attributes[$col] = $this->model->serializeArray($val);
-            else if(!empty($val))
+            //else if(!is_null($val))
+            //    $attributes[$col] = $val;
+            else
                 $attributes[$col] = $val;
+
         }
 
         return $attributes;

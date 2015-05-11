@@ -59,6 +59,13 @@ class MysqlSelection implements SelectionInterface {
 
         $this->querySql = "SELECT ". $this->sqlFields . " FROM " . $this->model->getTable();
 
+        $tableAlias = $this->model->getTableAlias();
+
+        if(!empty($tableAlias))
+        {   
+            $this->querySql .= " $tableAlias";
+        }   
+
         $joinClauses = array(
             'join',
             'leftjoin',
@@ -92,13 +99,12 @@ class MysqlSelection implements SelectionInterface {
     }
 
     public function findOneBy($args) {
-                    
-        $args = array_merge((array)$args,array('fetchArray'=>false));
 
+        $args = array_merge((array)$args,array('fetchArray'=>false));
      
         if(isset($args['order']))
             if(!stristr($args['order'],'limit')) $args['order'] .= " LIMIT 1";
- 
+        
         $this->findBy($args);
 
         $result = $this->_fetchObjectFromQuery();
