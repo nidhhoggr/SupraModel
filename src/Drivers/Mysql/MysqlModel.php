@@ -94,7 +94,7 @@ class MysqlModel extends MysqlDB implements DriverModelInterface
         if($this->isSerialized($val)) { 
             $nval = @unserialize(base64_decode($val));
             if(!$nval) {
-                Throw new Exception("Problem serializing: " . $val);
+                Throw new \Exception("Problem serializing: " . $val);
             }
             $val = $nval;
         }

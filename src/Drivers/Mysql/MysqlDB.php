@@ -193,7 +193,7 @@ class MysqlDB
     function debugAndThrowError($query)
     {
         echo($query . ' ' . mysql_error());
-        Throw new Exception($query . ' ' . mysql_error());
+        Throw new \Exception($query . ' ' . mysql_error());
     }
 
     /** Internal function to debug a MySQL query.\n
