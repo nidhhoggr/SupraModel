@@ -35,7 +35,7 @@ class MysqlDB
         $this->mtStart    = $this->getMicroTime();
         $this->nbQueries  = 0;
         $this->lastResult = NULL;
-        mysqli_connect($server, $user, $pass, $base) or die(mysqli_error($this->connection_link));
+        $this->connection_link = mysqli_connect($server, $user, $pass, $base) or die(mysqli_error($this->connection_link));
     }
 
     public function setDatabase($base) {
