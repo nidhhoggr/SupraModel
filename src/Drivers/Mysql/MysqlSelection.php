@@ -59,7 +59,7 @@ class MysqlSelection implements SelectionInterface {
 
         $this->querySql = "SELECT ". $this->sqlFields . " FROM " . $this->model->getTable();
 
-        $tableAlias = $this->model->getTableAlias();
+        $tableAlias = @ $this->model->getTableAlias();
 
         if(!empty($tableAlias))
         {   
