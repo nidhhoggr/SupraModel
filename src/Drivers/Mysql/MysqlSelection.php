@@ -32,7 +32,7 @@ class MysqlSelection implements SelectionInterface {
     }
 
     public function getQuery() {
- 
+
         return $this->querySql;
     }
 
@@ -53,7 +53,7 @@ class MysqlSelection implements SelectionInterface {
 
         if(isset($fields))
             $this->_sqlizeFields($fields);
-        
+
         if(isset($conditions))
             $this->_sqlizeConditions($conditions);        
 
@@ -78,7 +78,7 @@ class MysqlSelection implements SelectionInterface {
         foreach($joinClauses as $joinClause)
         {
             $joinType = str_replace('join', '', $joinClause);
-            
+
             $joinType = str_replace('_', ' ', $joinType);
 
             if(isset($$joinClause)) 
@@ -89,7 +89,7 @@ class MysqlSelection implements SelectionInterface {
                 }
             }
         }
-        
+
         $this->querySql .= ' ' . $this->sqlConditions;
 
         if(isset($order))
@@ -101,18 +101,24 @@ class MysqlSelection implements SelectionInterface {
     public function findOneBy($args) {
 
         $args = array_merge((array)$args,array('fetchArray'=>false));
-     
+
         if(isset($args['order']))
             if(!stristr($args['order'],'limit')) $args['order'] .= " LIMIT 1";
-        
+
         $this->findBy($args);
 
         $result = $this->_fetchObjectFromQuery();
 
         if(count($result))
-          return $result[0];
+        {
+            $this->model->mergeObjects($this->model, $result[0]);
+
+            return $result[0];
+        }
         else
-          return false;
+        {
+            return false;
+        }
     }
 
     private function _getResultFromQuery() {
@@ -122,45 +128,45 @@ class MysqlSelection implements SelectionInterface {
 
     private function _fetchObjectFromQuery() {
 
-       $result = $this->_getResultFromQuery();
+        $result = $this->_getResultFromQuery();
 
-       $all = array();
+        $all = array();
 
-       $fields = $this->sqlFields;
+        $fields = $this->sqlFields;
 
 
         while($row = mysql_fetch_object($result)) {
 
             $sm = new \stdClass();
- 
-            if($fields == "*") {
-              foreach($row as $k=>$col) {
 
-                try {
-                  $col = $this->model->unserializeArray($col);
-                } catch(Exception $e) {
-                  $col = false;
-                  $this->_catchException($e, $row);
+            if($fields == "*") {
+                foreach($row as $k=>$col) {
+
+                    try {
+                        $col = $this->model->unserializeArray($col);
+                    } catch(Exception $e) {
+                        $col = false;
+                        $this->_catchException($e, $row);
+                    }
+
+                    $sm->$k = $col;
                 }
 
-                $sm->$k = $col;
-              }
-
-              $all[] = $sm;
+                $all[] = $sm;
             }
             else if(is_array($fields)) {
                 foreach($fields as $field) {
 
-                  $val = $row->$field;
+                    $val = $row->$field;
 
-                  try {
-                    $val = $this->model->unserializeArray($val);
-                  } catch(Exception $e) {
-                    $val = false;
-                    $this->_catchException($e, $row);
-                  }
+                    try {
+                        $val = $this->model->unserializeArray($val);
+                    } catch(Exception $e) {
+                        $val = false;
+                        $this->_catchException($e, $row);
+                    }
 
-                  $sm->$field = $val;
+                    $sm->$field = $val;
                 }
 
                 $all[] = $sm;
@@ -168,12 +174,12 @@ class MysqlSelection implements SelectionInterface {
             else {
 
                 $val = $row->$fields;
- 
+
                 try { 
-                  $val = $this->model->unserializeArray($val);
+                    $val = $this->model->unserializeArray($val);
                 } catch(Exception $e) { 
-                  $val = false;
-                  $this->_catchException($e, $row);
+                    $val = false;
+                    $this->_catchException($e, $row);
                 }
 
                 $sm->$fields = $val;
@@ -186,10 +192,10 @@ class MysqlSelection implements SelectionInterface {
     }
 
     private function _catchException($e, $values) {
-              
-      $err = "Problem unpacking object of id: " . $values->{$this->model->getTableIdentifier()};
 
-      $this->errors[] = $err . " " .$e->getMessage();
+        $err = "Problem unpacking object of id: " . $values->{$this->model->getTableIdentifier()};
+
+        $this->errors[] = $err . " " .$e->getMessage();
     }
 
     public function getErrors() {

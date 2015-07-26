@@ -27,7 +27,9 @@ class MysqlModification implements ModificationInterface {
 
         //the record already exists by the specified identifier
         if(!empty($conditions) && $this->model->selectionHandler->findOneBy(compact('conditions'))) {
-        
+
+            $this->_setAttributes($attributes);    
+            
             $this->_update();
 
             //return the modified id
@@ -97,6 +99,7 @@ class MysqlModification implements ModificationInterface {
 
         $columns = $this->model->getColumnsByTable($this->model->getTable());
 
+
         foreach($columns as $col) {
 
             if(isset($this->model->$col))
@@ -116,7 +119,15 @@ class MysqlModification implements ModificationInterface {
         return $attributes;
     }
 
-    
+    private function _setAttributes($attributes)
+    {
+        foreach($attributes as $key=>$val)
+        {
+            $this->model->$key = $val;
+        }
+    }
+
+   
 
     private function _insertAttributes() {
 
@@ -156,9 +167,7 @@ class MysqlModification implements ModificationInterface {
         $attributes = $this->_updateAttributes();
 
         $sql = 'UPDATE ' . $this->model->getTable() . ' ' . $attributes;
- 
+
         $this->model->execute($sql);
     }
-
-
 }

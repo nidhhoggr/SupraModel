@@ -101,8 +101,13 @@ class MysqlModel extends MysqlDB implements DriverModelInterface
         return $val;
     }
 
-    public function bindObject(SupraModel &$cobj, stdClass $obj) {
+    public function bindObject(\stdClass $obj) {
 
+        $this->mergeObjects($this, $obj);
+    }
+
+    public function mergeObjects(&$cobj, \stdClass $obj)
+    {
         foreach((array) $obj as $k=>$v) {
             $cobj->$k = $v;
         }

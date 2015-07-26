@@ -1,8 +1,0 @@
-{
-  "dbuser": "root",
-  "dbpassword": "",
-  "dbname": "suprali_dentists",
-  "dbhost": "localhost",
-  "driver": "mysql"
-}
-

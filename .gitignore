@@ -1,3 +1,5 @@
+config/config.json
+
 # composer dir and files
 vendor
 composer.lock
