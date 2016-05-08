@@ -8,6 +8,7 @@ class MysqlSelection implements SelectionInterface {
     private 
         $querySql,
         $sqlFields,
+        $sqlizeFields,
         $sqlConditions;
 
     public function __construct(MysqlModel $model) {
@@ -17,7 +18,8 @@ class MysqlSelection implements SelectionInterface {
 
     private function _sqlizeFields($fields) {
 
-        $this->sqlFields = (is_array($fields)) ? implode(', ',$fields) : $fields;
+        $this->sqlFields = $fields;
+        $this->sqlizedFields = (is_array($fields)) ? implode(', ',$fields) : $fields;
     }
 
     private function _sqlizeConditions($conditions=null) {
@@ -57,7 +59,7 @@ class MysqlSelection implements SelectionInterface {
         if(isset($conditions))
             $this->_sqlizeConditions($conditions);        
 
-        $this->querySql = "SELECT ". $this->sqlFields . " FROM " . $this->model->getTable();
+        $this->querySql = "SELECT ". $this->sqlizedFields . " FROM " . $this->model->getTable();
 
         $tableAlias = @ $this->model->getTableAlias();
 
@@ -134,12 +136,11 @@ class MysqlSelection implements SelectionInterface {
 
         $fields = $this->sqlFields;
 
-
         while($row = mysqli_fetch_object($result)) {
 
             $sm = new \stdClass();
 
-            if($fields == "*") {
+            if($fields == "*" || is_array($fields)) {
                 foreach($row as $k=>$col) {
 
                     try {
@@ -150,23 +151,6 @@ class MysqlSelection implements SelectionInterface {
                     }
 
                     $sm->$k = $col;
-                }
-
-                $all[] = $sm;
-            }
-            else if(is_array($fields)) {
-                foreach($fields as $field) {
-
-                    $val = $row->$field;
-
-                    try {
-                        $val = $this->model->unserializeArray($val);
-                    } catch(Exception $e) {
-                        $val = false;
-                        $this->_catchException($e, $row);
-                    }
-
-                    $sm->$field = $val;
                 }
 
                 $all[] = $sm;
