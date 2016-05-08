@@ -45,24 +45,101 @@ class PostRepository extends SupraModel {
         $this->setTableIdentifier("ID");
     }
 
+    /**
+     * getJobListings
+     * 
+     *  Using `order` as `ORDER BY, `LIMIT` and ` and `LEFT JOIN`
+     *
+     *  Other JOIN options besides `LEFT JOIN` include 
+     *    `rightjoin`
+     *    `innerjoin`
+     *
+     * @access public
+     * @return array $posts
+     */
     public function getJobListings()
     {
         $posts = $this->findBy(array(
-            'conditions'=>array(
+            'conditions'=> [
                 "p.post_type = 'job_listing'",
                 "p.post_status = 'publish'",
                 "pm.meta_key = 'is_alert_queued'",
                 "pm.meta_value = '0'",
-            ),
-            'leftjoin'=>array(
+            ],
+            'leftjoin'=> [
                 "wp_postmeta pm" => "p.ID = pm.post_id"
-            ),
-            'order'=>'ORDER BY ID ASC LIMIT 5',
-            'fetchArray'=> true
+            ],
+            'order'=>'ORDER BY ID ASC LIMIT 5'
         ));
 
         return $posts;
     }
+
+    /**
+     * getOutdatedVideos
+     * 
+     *  using `fields` as SELECT 
+     * 
+     * @access public
+     * @return void
+     */
+    function getOutdatedVideos() {
+
+        $videos = $this->findBy([
+            "leftjoin" =>  [
+                "song s" => "v.song_id = s.id",
+                "album a" => "a.id = s.album_id",
+                "band b" => "b.id = a.band_id"
+            ],
+            "fields" => ["s.name as songName", "b.name as bandName","a.name as albumName","v.*"],
+            "conditions" => ["v.id > 165"]
+        ]);
+
+        foreach($videos as $video) {
+
+            $v_id = str_replace("http://gdata.youtube.com/feeds/api/videos/", "", $video->guid);
+            $status = $this->getVideoUrlStatus("http://img.youtube.com/vi/{$v_id}/3.jpg");
+            if($status === 404) {
+                var_dump($video);
+                $this->updateOutdatedVideo($video);
+            }
+        }
+    }
+
+    /**
+     * getDuplicateVideos
+     * 
+     * Using a raw query.
+     *
+     * Must close the object when using fetchNextObject to no interfere with mysqli_result for 
+     * the parent query.
+     *
+     *
+     * @access public
+     * @return void
+     */
+    function getDuplicateVideos() {
+
+        $this->query("SELECT link, COUNT(*) c FROM yt_video GROUP BY link HAVING c > 1");
+
+        $duplicateVideos = array();
+
+        $finder = new self;
+
+        while($row = $this->fetchNextObject()) {
+
+            $videos = $finder->findBy([
+              "fields" => ["id"],
+              "conditions" => ["yt.link LIKE '%{$row->link}%'"],
+            ]);
+
+            $duplicateVideos[] = $videos;
+        }
+
+        return $duplicateVideos;
+    }
+
+
 }
 ```
 
