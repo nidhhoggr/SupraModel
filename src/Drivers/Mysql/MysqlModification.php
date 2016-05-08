@@ -78,13 +78,17 @@ class MysqlModification implements ModificationInterface {
         return $this->model->lastInsertedId();
     }
 
-    public function delete() {
+    public function delete($id = null) {
 
         $identifier = $this->model->getTableIdentifier();
 
         $attributes = $this->_getAttributes();
 
-        $where = ' WHERE ' . $identifier .' = '. $attributes[$identifier];
+        if(empty($id)) {
+            $id = $attributes[$identifier];
+        }
+
+        $where = ' WHERE ' . $identifier .' = '. $id;
 
         $sql = 'DELETE FROM ' . $this->model->getTable() . ' ' . $where;
 
