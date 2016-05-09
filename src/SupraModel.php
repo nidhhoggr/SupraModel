@@ -20,33 +20,44 @@ namespace SupraModel;
 abstract class SupraModel {
 
     private
-        $dbhost = "",
-        $dbuser = "",
-        $dbpassword = "",
-        $dbname = "";
+        $dbhost = null,
+        $dbuser = null,
+        $dbpassword = null,
+        $dbname = null,
+        $driver = null,
+        $dbConfigDirectory = null;
+
+    protected $driverModel;
 
     function __construct($args = array()) {
 
-        if(!count($args))
-        {
-            $yaml_settings_file = dirname(__FILE__) . '/../config/config.yml';
-            
-            $json_settings_file = dirname(__FILE__) . '/../config/config.json';
+        if(count($args) && !empty($args['dbConfigDirectory'])) {
 
-            if(function_exists('yaml_parse_file') && file_exists($yaml_settings_file))
-            {
-                $args = yaml_parse_file($yaml_settings_file);
-            }
-            else if(file_exists($json_settings_file))
-            {
-                $args = json_decode(file_get_contents($json_settings_file),  true);
-            }        
+            $this->dbConfigDirectory = $args['dbConfigDirectory'];
+        } 
+        else {
+
+            $this->dbConfigDirectory = dirname(__FILE__) . '/../config/';
+        }
+
+        $yaml_settings_file = $this->dbConfigDirectory . 'config.yml';
+
+        $json_settings_file = $this->dbConfigDirectory . 'config.json';
+
+
+        if(function_exists('yaml_parse_file') && file_exists($yaml_settings_file)) {
+    
+            $args = yaml_parse_file($yaml_settings_file);
+        }
+        else if(file_exists($json_settings_file)) {
+    
+            $args = json_decode(file_get_contents($json_settings_file),  true);
         }
 
         $this->_setConnection($args);
         
         $this->setDriver($args['driver']);
-        
+       
         $this->_instantiateDriverModel();
         
         $this->configure();
