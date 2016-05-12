@@ -23,6 +23,25 @@ new AlertModel([
 
 ```
 
+`Or`
+
+```php
+$mm = new MetalModel(["dbConfigDirectory" => dirname(__FILE__) . '/../config/']);
+
+```
+`And`
+
+```json
+{
+  "dbuser":"root",
+  "dbname":"metalsubgenres",
+  "dbpassword":"",
+  "dbhost":"localhost",
+  "driver":"mysql"
+}
+
+```
+
 If a SupraModel child class is instantiated with credentials, they will override whaveter is provided
 in config.(json|yml)
 
