@@ -56,6 +56,8 @@ class MysqlModification implements ModificationInterface {
             $conditions = $identifier . ' = "' . $attributes[$identifier] . '"';
 
         $this->_update();
+        
+        $this->_refresh();
 
             //return the modified id
         return $attributes[$identifier];
