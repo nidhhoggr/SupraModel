@@ -10,14 +10,23 @@ class MysqlModel extends MysqlDB implements DriverModelInterface
     private 
         $debugMode = false,
         $table_identifier = "id";
+        
 
     public function __construct($base, $server, $user, $pass) {
 
         $this->dbArgs = compact('base','server','user','pass');
 
         parent::__construct($base, $server, $user, $pass);
-
+        
         $this->_generateHandlers();
+    }
+
+    public function setColumns( $columns ) {
+        $this->columns = $columns;
+    }
+
+    public function getColumns() {
+        return @$this->columns;
     }
 
     public function reinitialize($supraModelChild) {
@@ -56,6 +65,8 @@ class MysqlModel extends MysqlDB implements DriverModelInterface
     public function setTable($table) {
 
         $this->table = $table;
+
+        unset($this->columns);
     }
 
     public function setTableAlias($table_alias)

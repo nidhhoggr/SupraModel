@@ -73,9 +73,34 @@ class MysqlModification implements ModificationInterface {
             $conditions = $identifier . ' = "' . $attributes[$identifier] . '"';
 
         $this->_insert();
+        
+        $this->_refresh();
 
         //return the last insertion id
         return $this->model->lastInsertedId();
+    }
+
+    protected function _getColumns() {
+
+        $columns = $this->model->getColumns();
+
+        if(empty($columns)) {
+            $columns = $this->model->getColumnsByTable($this->model->getTable());
+            $this->model->setColumns($columns);
+        }
+
+        return $columns;
+    }
+
+    protected function _refresh() {
+        foreach($this->_getColumns() as $col) {
+            if(isset($this->model->$col)) {
+              $this->model->$col = null;
+            }
+            else {
+              continue;
+            }
+        }
     }
 
     public function delete($id = null) {
@@ -94,6 +119,8 @@ class MysqlModification implements ModificationInterface {
 
         $this->model->execute($sql);
 
+        $this->_refresh();
+        
         return $this->model->numRowsAffected();
     }
 
@@ -101,8 +128,7 @@ class MysqlModification implements ModificationInterface {
 
         $attributes = array();
 
-        $columns = $this->model->getColumnsByTable($this->model->getTable());
-
+        $columns = $this->_getColumns();
 
         foreach($columns as $col) {
 
@@ -113,11 +139,8 @@ class MysqlModification implements ModificationInterface {
  
             if(is_array($val))
                 $attributes[$col] = $this->model->serializeArray($val);
-            //else if(!is_null($val))
-            //    $attributes[$col] = $val;
             else
                 $attributes[$col] = $val;
-
         }
 
         return $attributes;

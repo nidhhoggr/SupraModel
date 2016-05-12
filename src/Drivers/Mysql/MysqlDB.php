@@ -25,6 +25,8 @@ class MysqlDB
 
         $tableColumns,
 
+        $connection_link,
+
         $lastSql
     ;
 
@@ -36,6 +38,10 @@ class MysqlDB
         $this->nbQueries  = 0;
         $this->lastResult = NULL;
         $this->connection_link = mysqli_connect($server, $user, $pass, $base) or die(mysqli_error($this->connection_link));
+    }
+
+    public function getConnectionLink() {
+        return $this->connection_link;
     }
 
     public function setDatabase($base) {
