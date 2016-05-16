@@ -28,9 +28,9 @@ class MysqlModification implements ModificationInterface {
         //the record already exists by the specified identifier
         if(!empty($conditions) && $this->model->selectionHandler->findOneBy(compact('conditions'))) {
 
-            $this->_setAttributes($attributes);    
+            $this->_update($attributes);
             
-            $this->_update();
+            $this->_refresh();
 
             //return the modified id
             return $attributes[$identifier];
@@ -39,6 +39,9 @@ class MysqlModification implements ModificationInterface {
         else {
             $this->_insert();
             //return the last insertion id
+                
+            $this->_refresh();
+
             return $this->model->lastInsertedId();
         }
 
@@ -95,6 +98,7 @@ class MysqlModification implements ModificationInterface {
     }
 
     protected function _refresh() {
+        
         foreach($this->_getColumns() as $col) {
             if(isset($this->model->$col)) {
               $this->model->$col = null;
@@ -168,10 +172,12 @@ class MysqlModification implements ModificationInterface {
         return $attr;
     }
 
-    private function _updateAttributes() {
+    private function _updateAttributes($attributes) {
         $identifier = $this->model->getTableIdentifier();
 
-        $attributes = $this->_getAttributes();
+        if(!isset($attributes)) {
+            $attributes = $this->_getAttributes();
+        }
 
         foreach($attributes as $k=>$v) {
             if($k != $identifier)
@@ -192,10 +198,13 @@ class MysqlModification implements ModificationInterface {
         $this->model->execute($sql);
     }
 
-    private function _update() {
-        $attributes = $this->_updateAttributes();
+    private function _update($attributes) {
+        
+        $attributes = $this->_updateAttributes($attributes);
 
         $sql = 'UPDATE ' . $this->model->getTable() . ' ' . $attributes;
+
+        var_dump($sql);
 
         $this->model->execute($sql);
     }
