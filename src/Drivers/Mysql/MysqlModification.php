@@ -204,8 +204,6 @@ class MysqlModification implements ModificationInterface {
 
         $sql = 'UPDATE ' . $this->model->getTable() . ' ' . $attributes;
 
-        var_dump($sql);
-
         $this->model->execute($sql);
     }
 }
