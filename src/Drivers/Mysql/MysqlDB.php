@@ -37,7 +37,7 @@ class MysqlDB
         $this->mtStart    = $this->getMicroTime();
         $this->nbQueries  = 0;
         $this->lastResult = NULL;
-        $this->connection_link = mysqli_connect($server, $user, $pass, $base) or die(mysqli_error($this->connection_link));
+        $this->connection_link = mysqli_connect($server, $user, $pass, $base) or die(mysqli_connect_error());
     }
 
     public function getConnectionLink() {
@@ -45,7 +45,11 @@ class MysqlDB
     }
 
     public function setDatabase($base) {
-        mysqli_select_db($this->connection_link, $base) or die(mysqli_error($this->connection_link));
+      mysqli_select_db($this->connection_link, $base) or die(mysqli_error($this->connection_link));
+      mysqli_query($this->connection_link, "SET character_set_results=utf8");
+      mb_language('uni');
+      mb_internal_encoding('UTF-8');
+      mysqli_query($this->connection_link, "set names 'utf8'");
     }
 
 
