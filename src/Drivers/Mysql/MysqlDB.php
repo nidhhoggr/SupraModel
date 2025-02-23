@@ -360,6 +360,10 @@ class MysqlDB
         mysqli_query($this->connection_link, "TRUNCATE TABLE $table");
     }
 
+    function escapeString($str) {
+      return mysqli_real_escape_string($this->connection_link, $str);
+    }
+
     function getColumnsByTable($table, $fromCache = true) {
 
         if($fromCache && !is_null($this->tableColumns[$table])) { 
